@@ -7,6 +7,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Fredoka:wght@500;600;700&family=Marcellus&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
+  /* [hidden] doit toujours l'emporter, même sur les éléments dont une
+     classe (ex. .pastille) fixe elle-même son display — sinon un élément
+     masqué par script peut rester visible à l'écran malgré tout. */
+  [hidden]{display:none !important}
+
   :root{
     --encre:#1D2B53;
     --encre-douce:#4A5578;
@@ -67,13 +72,17 @@
     display:block;flex-shrink:0;
     filter:drop-shadow(0 2px 0 rgba(29,43,83,.18));
   }
-  .stats{margin-left:auto;display:flex;gap:10px}
+  .stats{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+  .stats-pastilles{display:flex;gap:10px}
+  .code-actif{font-size:.78rem;font-weight:700;color:var(--brun-doux)}
   .pastille{
     display:flex;align-items:center;gap:6px;
     background:#FCFAF3;border:1.5px solid rgba(198,167,109,.55);border-radius:999px;
     padding:5px 14px;font-weight:800;font-size:.95rem;color:var(--encre-chaude);
   }
   .pastille .ic{font-size:1.05rem}
+  .pastille-lien{cursor:pointer;font-family:'Fredoka',sans-serif}
+  .pastille-lien:hover{border-color:var(--vert);color:var(--vert)}
 
   /* ---------- Écrans ---------- */
   .ecran{display:none;max-width:980px;margin:0 auto;padding:28px 20px 80px}
@@ -193,6 +202,19 @@
   }
   .sous-titre-section{color:var(--encre-douce);font-weight:600;margin-bottom:22px}
   .grille-chapitres{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+  .carte-classe{
+    background:#FCFAF3;border:2px solid #C6A76D;border-radius:18px;
+    padding:26px 20px;text-align:center;font-family:'Marcellus',serif;font-size:1.3rem;
+    color:var(--encre-chaude);cursor:pointer;transition:border-color .15s ease,box-shadow .15s ease;
+  }
+  .carte-classe:hover{border-color:#A98A4F;box-shadow:0 0 0 3px rgba(198,167,109,.25)}
+  .table-eleves{width:100%;border-collapse:collapse;margin-top:18px}
+  .table-eleves th{
+    text-align:left;font-family:'Marcellus',serif;font-weight:400;letter-spacing:.05em;
+    color:var(--brun-doux);font-size:.82rem;padding:8px 10px;border-bottom:2px solid var(--ligne);
+  }
+  .table-eleves td{padding:10px;border-bottom:1px solid var(--ligne);font-weight:600;color:var(--encre)}
+  .table-eleves tr:hover td{background:#FCFAF3}
   /* Panneau façon TotK : fond blanc cassé, glyphes circulaires Soneau
      en filigrane sur les côtés (clippés par les bords, comme en jeu),
      bordure dorée. Les centres des cercles sont volontairement hors
@@ -302,6 +324,13 @@
   /* Conseillée : la lumière qui guide (pulsation dorée conservée) */
   .noeud.dispo .rond{border-color:var(--jaune);animation:pulse 1.8s infinite}
   @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,201,60,.55)}50%{box-shadow:0 0 0 12px rgba(255,201,60,0)}}
+  /* Verrouillée : tuile éteinte, cadenas à la place de l'emblème */
+  .noeud.verrouille .rond{
+    opacity:.6;cursor:not-allowed;color:var(--brun-doux);
+    background:#F2F0E6;border-color:#D9D2BE;
+  }
+  .noeud.verrouille .rond:hover{transform:none;box-shadow:none}
+  .note-verrou{color:var(--brun-doux);font-weight:600;font-size:.85rem;font-style:italic}
   .noeud .infos .mini{font-family:'Marcellus',serif;font-size:.72rem;letter-spacing:.18em;color:var(--brun-doux)}
   .pastille-repetable{
     display:inline-block;margin-left:8px;vertical-align:middle;
@@ -813,6 +842,34 @@
   #voileVictoire .grosses-etoiles .vide{color:rgba(255,255,255,.18);text-shadow:none}
   #voileVictoire .fenetre p{color:rgba(243,238,225,.78)}
 
+  /* Détail de progression d'un élève (vue enseignante) : même sanctuaire nocturne */
+  .fenetre-large{max-width:640px;text-align:left}
+  #voileProgressionEleve .fenetre{
+    background:linear-gradient(160deg,#101C3A,#17264C 60%,#122040);
+    border:1px solid rgba(47,200,150,.45);
+    position:relative;max-height:82vh;overflow-y:auto;
+  }
+  #voileProgressionEleve h2{
+    font-family:'Marcellus',serif;font-weight:400;letter-spacing:.04em;color:#F3EEE1;margin-bottom:14px;
+  }
+  .fermer-fenetre{
+    position:absolute;top:16px;right:16px;background:none;border:none;
+    color:rgba(243,238,225,.7);font-size:1.1rem;cursor:pointer;
+  }
+  .fermer-fenetre:hover{color:#F3EEE1}
+  .module-progression-ens{margin-bottom:16px}
+  .module-progression-ens h4{
+    font-family:'Marcellus',serif;font-weight:400;color:#9FF0D6;font-size:1rem;
+    margin-bottom:6px;letter-spacing:.03em;
+  }
+  .module-progression-ens ul{list-style:none;padding:0;margin:0}
+  .module-progression-ens li{
+    display:flex;justify-content:space-between;padding:6px 4px;
+    color:rgba(243,238,225,.85);font-weight:600;font-size:.92rem;
+    border-bottom:1px solid rgba(243,238,225,.12);
+  }
+  .module-progression-ens li span:last-child{color:var(--jaune);letter-spacing:2px}
+
   footer{
     text-align:center;color:var(--encre-douce);font-weight:600;font-size:.85rem;
     padding:20px;border-top:2px solid var(--ligne);
@@ -1180,6 +1237,19 @@
   .saisie-reponse:focus{outline:3px solid rgba(198,167,109,.45);outline-offset:2px}
   .saisie-reponse.juste{background:#E9F8ED;border-color:#43B75D;color:#14532D}
   .saisie-reponse.rate{animation:secousse .5s ease;border-color:#F5A99B;background:#FFECE8}
+  .saisie-code{width:180px;text-transform:uppercase;letter-spacing:.05em}
+  .saisie-cle{width:220px}
+  .lien-anonyme{
+    display:block;margin:14px auto 2px;background:none;border:none;
+    color:var(--brun-doux);font-weight:700;text-decoration:underline;cursor:pointer;font-size:.9rem;
+  }
+  .note-anonyme{font-size:.78rem;color:var(--brun-doux);margin:2px 0 0}
+  .onglets-identification{display:flex;justify-content:center;gap:8px;margin:6px 0 16px}
+  .onglet-id{
+    background:none;border:2px solid rgba(198,167,109,.55);border-radius:999px;
+    padding:6px 16px;font-weight:700;font-family:'Fredoka',sans-serif;color:var(--brun-doux);cursor:pointer;
+  }
+  .onglet-id.actif{background:var(--vert);border-color:var(--vert);color:#fff}
 
   /* ---- Module 4 · La machine à nombres ----
      Le programme de calcul se lit de HAUT EN BAS, comme sur le cahier :
@@ -1466,8 +1536,14 @@
       </svg> Branché
     </button>
     <div class="stats">
-      <span class="pastille" title="Étoiles gagnées"><span class="ic">⭐</span><span id="totalEtoiles">0</span></span>
-      <span class="pastille" title="Capsules réussies"><span class="ic">🚀</span><span id="totalMissions">0</span></span>
+      <div class="stats-pastilles" id="statsPastilles">
+        <span class="pastille" title="Étoiles gagnées"><span class="ic">⭐</span><span id="totalEtoiles">0</span></span>
+        <span class="pastille" title="Capsules réussies"><span class="ic">🚀</span><span id="totalMissions">0</span></span>
+      </div>
+      <button class="pastille pastille-lien" id="btnProgressions" hidden onclick="ouvrirProgressions()">
+        <span class="ic">📊</span> Progressions des élèves
+      </button>
+      <span class="code-actif" id="codeActif" hidden><span id="codeAffiche"></span></span>
     </div>
   </div>
 </header>
@@ -1539,6 +1615,64 @@
   <button class="retour" id="retourChapitre">← Retour au module</button>
   <div class="cadre-mission" id="cadreMission"></div>
 </main>
+
+<!-- ================= PROGRESSIONS (vue enseignant) ================= -->
+<main id="ecran-progressions" class="ecran">
+  <button class="retour" onclick="allerAccueil()">← Retour à l'appli</button>
+  <h2 class="titre-section">Progressions des élèves</h2>
+  <p class="sous-titre-section" id="sousTitreProgressions">Choisis une classe pour voir où en est chaque élève.</p>
+  <div class="grille-chapitres" id="grilleClasses"></div>
+  <div id="listeEleves" hidden></div>
+</main>
+
+<!-- ================= DÉTAIL PROGRESSION D'UN ÉLÈVE ================= -->
+<div class="voile" id="voileProgressionEleve" role="dialog" aria-modal="true" aria-labelledby="titreProgressionEleve">
+  <div class="fenetre fenetre-large">
+    <button class="fermer-fenetre" onclick="fermerProgressionEleve()" aria-label="Fermer">✕</button>
+    <h2 id="titreProgressionEleve"></h2>
+    <div id="corpsProgressionEleve"></div>
+  </div>
+</div>
+
+<!-- ================= CODE ÉLÈVE / ENSEIGNANT ================= -->
+<div class="voile" id="voileCode" role="dialog" aria-modal="true" aria-labelledby="titreCode">
+  <div class="fenetre">
+    <div style="font-size:3rem">🔑</div>
+    <h2 id="titreCode">Qui es-tu ?</h2>
+    <div class="onglets-identification">
+      <button class="onglet-id actif" id="ongletEleve" onclick="afficherOngletId('eleve')">Élève</button>
+      <button class="onglet-id" id="ongletEns" onclick="afficherOngletId('enseignant')">Enseignant</button>
+    </div>
+
+    <div id="panneauEleve">
+      <p>Ton professeur t'a donné un code (ex. 6A-07). Il permet de retrouver ta progression, sans mot de passe.</p>
+      <div class="zone-saisie">
+        <input id="saisieCode" class="saisie-reponse saisie-code" maxlength="12" autocomplete="off"
+          aria-label="Ton code" placeholder="6A-07"
+          onkeydown="if(event.key==='Enter')validerCode()">
+      </div>
+      <p id="erreurCode" style="color:var(--corail);font-weight:700;min-height:1.2em"></p>
+      <div class="commandes" style="justify-content:center">
+        <button class="btn btn-vert" onclick="validerCode()">C'est parti →</button>
+      </div>
+      <button class="lien-anonyme" onclick="continuerAnonyme()">Continuer en anonyme</button>
+      <p class="note-anonyme">Sans code, ta progression ne sera pas sauvegardée.</p>
+    </div>
+
+    <div id="panneauEnseignant" hidden>
+      <p>Entre ta clé enseignant pour accéder au suivi de tes classes.</p>
+      <div class="zone-saisie">
+        <input id="saisieCle" type="password" class="saisie-reponse saisie-cle" maxlength="40" autocomplete="off"
+          aria-label="Ta clé enseignant" placeholder="Clé enseignant"
+          onkeydown="if(event.key==='Enter')validerEnseignant()">
+      </div>
+      <p id="erreurEns" style="color:var(--corail);font-weight:700;min-height:1.2em"></p>
+      <div class="commandes" style="justify-content:center">
+        <button class="btn btn-vert" onclick="validerEnseignant()">Entrer →</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ================= VICTOIRE ================= -->
 <div class="voile" id="voileVictoire" role="dialog" aria-modal="true" aria-labelledby="titreVictoire">
@@ -1981,21 +2115,235 @@ const CHAPITRES = [
 ];
 
 /* =============================================================
-   PROGRESSION — sauvegarde (avec repli en mémoire)
+   PARCOURS — déverrouillage progressif (élèves uniquement)
+   Chaque capsule normale débloque la capsule normale suivante. Un défi
+   est débloqué en même temps que la capsule qui le précède, mais ne
+   conditionne jamais la suite : il vit « à côté » du parcours principal.
+   Exemple : la capsule 5 du module Scratch débloque à la fois son défi
+   ET la capsule 1 du module suivant, puisque tous deux dépendent de la
+   même dernière capsule normale rencontrée.
    ============================================================= */
+const DECLENCHEURS = {}; // id de capsule -> id de la capsule à réussir avant (ou null si aucune)
+(function construireDeclencheurs(){
+  let precedenteNormale = null;
+  for(const ch of CHAPITRES){
+    for(const m of ch.missions){
+      DECLENCHEURS[m.id] = precedenteNormale;
+      if(!m.defi) precedenteNormale = m.id;
+    }
+  }
+})();
+
+function missionDebloquee(id){
+  const decl = DECLENCHEURS[id];
+  return decl == null || etoilesMission(decl) > 0;
+}
+function missionAccessible(m){
+  return modeEnseignant || missionFaite(m.id) || missionDebloquee(m.id);
+}
+
+/* =============================================================
+   PROGRESSION — sauvegarde en ligne (Google Sheet via Apps Script)
+   ============================================================= */
+/* 👉 Colle ici l'URL obtenue à l'étape « Déployer en application
+   web » (elle se termine par /exec). Rien ne fonctionnera tant que
+   cette ligne n'est pas complétée. */
+const API_URL = "https://script.google.com/macros/s/AKfycbxlZL44Bg0sCgcJQWhtv4GxEOP845hwh5952LJlsgVpGd3H7KUU2KSH3_PhMjxP51hy/exec";
+
 let progression = {}; // { idMission : nbEtoiles }
 let stockageOK = true;
 
+/* Le code n'est pas un mot de passe : juste un identifiant donné par
+   l'enseignant. Il n'est PAS mémorisé d'une visite à l'autre — plusieurs
+   élèves partagent souvent le même ordinateur en classe, il ne faut donc
+   jamais réutiliser automatiquement le code du visiteur précédent. */
+let codeActuel = "";
+let prenomActuel = "";
+let modeAnonyme = false;
+let modeEnseignant = false;
+let cleEnseignante = "";
+let classesDisponibles = [];
+function codeEleve(){ return codeActuel; }
+function definirCodeEleve(c){ codeActuel = c; }
+
+function afficherOngletId(nom){
+  const estEleve = nom === "eleve";
+  document.getElementById("ongletEleve").classList.toggle("actif", estEleve);
+  document.getElementById("ongletEns").classList.toggle("actif", !estEleve);
+  document.getElementById("panneauEleve").hidden = !estEleve;
+  document.getElementById("panneauEnseignant").hidden = estEleve;
+}
+
 async function chargerProgression(){
+  if(modeAnonyme){ rafraichirTout(); return {ok:true}; }
   try{
-    const r = await window.storage.get("branche-progression");
-    if(r && r.value) progression = JSON.parse(r.value);
-  }catch(e){ /* première visite ou stockage indisponible */ }
+    const reponse = await fetch(`${API_URL}?code=${encodeURIComponent(codeEleve())}`);
+    const donnees = await reponse.json();
+    if(donnees && donnees.erreur === "code inconnu"){
+      rafraichirTout();
+      return {ok:false};
+    }
+    if(donnees && !donnees.erreur){
+      progression = donnees.progression || {};
+      prenomActuel = donnees.prenom || "";
+    }
+  }catch(e){ stockageOK = false; /* pas de réseau : on ne bloque pas l'élève, on continue en mémoire */ }
+  rafraichirTout();
+  return {ok:true};
+}
+async function sauverProgression(id){
+  if(modeAnonyme || modeEnseignant) return; // choix assumé, ou simple démo en classe : rien n'est envoyé au serveur
+  try{
+    await fetch(API_URL, {
+      method:"POST",
+      headers:{ "Content-Type":"text/plain;charset=utf-8" }, // évite le pré-vol CORS avec Apps Script
+      body: JSON.stringify({ code:codeEleve(), id_capsule:id, etoiles:progression[id] })
+    });
+  }catch(e){ stockageOK = false; }
+}
+
+async function validerCode(){
+  const champ = document.getElementById("saisieCode");
+  const code = (champ.value||"").trim().toUpperCase();
+  if(code.length < 2){
+    document.getElementById("erreurCode").textContent = "Écris ton code avant de continuer.";
+    champ.focus();
+    return;
+  }
+  modeAnonyme = false;
+  definirCodeEleve(code);
+  document.getElementById("erreurCode").textContent = "Vérification…";
+  const resultat = await chargerProgression();
+  if(!resultat.ok){
+    document.getElementById("erreurCode").textContent = "Code non reconnu — vérifie auprès de ton professeur.";
+    codeActuel = "";
+    return;
+  }
+  document.getElementById("erreurCode").textContent = "";
+  document.getElementById("codeAffiche").textContent = prenomActuel || code; // repli sur le code si le prénom n'est pas encore renseigné
+  document.getElementById("codeActif").hidden = false;
+  document.getElementById("voileCode").classList.remove("actif");
+}
+
+function continuerAnonyme(){
+  modeAnonyme = true;
+  document.getElementById("codeActif").hidden = true;
+  document.getElementById("voileCode").classList.remove("actif");
   rafraichirTout();
 }
-async function sauverProgression(){
-  try{ await window.storage.set("branche-progression", JSON.stringify(progression)); }
-  catch(e){ stockageOK = false; }
+
+async function validerEnseignant(){
+  const champ = document.getElementById("saisieCle");
+  const cle = (champ.value||"").trim();
+  if(cle.length < 2){
+    document.getElementById("erreurEns").textContent = "Écris ta clé avant de continuer.";
+    champ.focus();
+    return;
+  }
+  document.getElementById("erreurEns").textContent = "Vérification…";
+  try{
+    const reponse = await fetch(`${API_URL}?mode=enseignant&cle=${encodeURIComponent(cle)}&vue=classes`);
+    const donnees = await reponse.json();
+    if(!donnees || donnees.erreur){
+      document.getElementById("erreurEns").textContent = "Clé incorrecte.";
+      return;
+    }
+    modeEnseignant = true;
+    modeAnonyme = false;
+    cleEnseignante = cle;
+    classesDisponibles = donnees.classes || [];
+    document.getElementById("erreurEns").textContent = "";
+    document.getElementById("voileCode").classList.remove("actif");
+    document.getElementById("statsPastilles").hidden = true;
+    document.getElementById("btnProgressions").hidden = false;
+    document.getElementById("codeAffiche").textContent = "Mode enseignant";
+    document.getElementById("codeActif").hidden = false;
+  }catch(e){
+    document.getElementById("erreurEns").textContent = "Connexion impossible. Réessaie.";
+  }
+}
+
+/* ---- Vue enseignante : classes puis élèves puis détail d'un élève ---- */
+function ouvrirProgressions(){
+  changerEcran("ecran-progressions");
+  document.getElementById("sousTitreProgressions").hidden = false;
+  document.getElementById("listeEleves").hidden = true;
+  const grille = document.getElementById("grilleClasses");
+  grille.hidden = false;
+  try{
+    grille.innerHTML = classesDisponibles.length
+      ? classesDisponibles.map(c => { const nom = String(c); return `<button class="carte-classe" onclick="ouvrirClasseProgressions('${nom.replace(/'/g,"\\'")}')">${nom}</button>`; }).join("")
+      : "<p>Aucune classe trouvée dans l'onglet « codes » du classeur.</p>";
+  }catch(e){
+    grille.innerHTML = `<p>Erreur d'affichage : ${e.message}</p>`;
+  }
+}
+
+async function ouvrirClasseProgressions(classe){
+  const grille = document.getElementById("grilleClasses");
+  const zone = document.getElementById("listeEleves");
+  document.getElementById("sousTitreProgressions").hidden = true;
+  grille.hidden = true;
+  zone.hidden = false;
+  zone.innerHTML = "<p>Chargement…</p>";
+  try{
+    const reponse = await fetch(`${API_URL}?mode=enseignant&cle=${encodeURIComponent(cleEnseignante)}&vue=classe&classe=${encodeURIComponent(classe)}`);
+    const donnees = await reponse.json();
+    const eleves = donnees.eleves || [];
+    zone.innerHTML = `
+      <button class="retour" onclick="ouvrirProgressions()">← Toutes les classes</button>
+      <h3>${classe}</h3>
+      <table class="table-eleves">
+        <thead><tr><th>Élève</th><th>Code</th><th>Dernière capsule</th><th>Étoiles</th><th></th></tr></thead>
+        <tbody>
+          ${eleves.map(el => `
+            <tr>
+              <td>${el.prenom || "—"}</td>
+              <td>${el.code}</td>
+              <td>${libelleCapsule(el.derniereCapsule)}</td>
+              <td>${el.totalEtoiles || 0} ⭐</td>
+              <td><button class="btn btn-gris" onclick="ouvrirProgressionEleve('${el.code}','${(el.prenom||el.code).replace(/'/g,"\\'")}')">Progression</button></td>
+            </tr>`).join("")}
+        </tbody>
+      </table>`;
+  }catch(e){
+    zone.innerHTML = `<button class="retour" onclick="ouvrirProgressions()">← Toutes les classes</button>
+      <p>Impossible de charger cette classe pour le moment.</p>`;
+  }
+}
+
+function libelleCapsule(id){
+  if(!id) return "—";
+  for(const ch of CHAPITRES){
+    const m = ch.missions.find(x=>x.id===id);
+    if(m) return `${ch.titre} · ${m.titre}`;
+  }
+  return id;
+}
+
+async function ouvrirProgressionEleve(code, prenom){
+  document.getElementById("titreProgressionEleve").textContent = prenom;
+  const corps = document.getElementById("corpsProgressionEleve");
+  corps.innerHTML = "<p>Chargement…</p>";
+  document.getElementById("voileProgressionEleve").classList.add("actif");
+  try{
+    const reponse = await fetch(`${API_URL}?code=${encodeURIComponent(code)}`);
+    const donnees = await reponse.json();
+    const prog = (donnees && donnees.progression) || {};
+    corps.innerHTML = CHAPITRES.map(ch => `
+      <div class="module-progression-ens">
+        <h4>${ch.titre}</h4>
+        <ul>
+          ${ch.missions.map(m => `<li><span>${m.titre}</span><span>${"★".repeat(prog[m.id]||0)}${"☆".repeat(3-(prog[m.id]||0))}</span></li>`).join("")}
+        </ul>
+      </div>`).join("");
+  }catch(e){
+    corps.innerHTML = "<p>Impossible de charger la progression pour le moment.</p>";
+  }
+}
+
+function fermerProgressionEleve(){
+  document.getElementById("voileProgressionEleve").classList.remove("actif");
 }
 
 function etoilesMission(id){ return progression[id] || 0; }
@@ -2149,25 +2497,27 @@ function ouvrirChapitre(i){
   const prochaine = ch.missions.findIndex(m=>!missionFaite(m.id)); // capsule conseillée
   ch.missions.forEach((m,j)=>{
     const fait = missionFaite(m.id);
-    const conseillee = j === prochaine;
+    const accessible = missionAccessible(m);
+    const conseillee = j === prochaine && accessible;
     const noeud = document.createElement("div");
     const typeN = (m.type==="focus"||m.focus) ? "type-focus" : m.defi ? "type-defi" : "type-capsule";
-    noeud.className = "noeud " + typeN + " " + (fait ? "fait" : conseillee ? "dispo" : "");
+    noeud.className = "noeud " + typeN + " " + (fait ? "fait" : accessible ? (conseillee ? "dispo" : "") : "verrouille");
     const et = etoilesMission(m.id);
     noeud.innerHTML = `
-      <button class="rond" aria-label="Capsule ${j+1} : ${m.titre}${fait ? " (réussie)" : conseillee ? " (conseillée)" : ""}">
-        ${emblemeNoeud(m)}
+      <button class="rond" ${accessible ? "" : "disabled"}
+        aria-label="Capsule ${j+1} : ${m.titre}${fait ? " (réussie)" : !accessible ? " (verrouillée)" : conseillee ? " (conseillée)" : ""}">
+        ${accessible ? emblemeNoeud(m) : "🔒"}
         ${fait ? `<span class="coche" aria-hidden="true">✓</span>` : ""}
       </button>
       <div class="infos">
         <div class="mini">CAPSULE ${j+1}${m.repetable
           ? `<span class="pastille-repetable" title="De nouveaux nombres à chaque fois">🔄 Répétable</span>` : ""}</div>
         <h4>${m.titre}</h4>
-        <div class="etoiles" aria-label="${et} étoile(s) sur 3">
-          ${"★".repeat(et)}<span class="vide">${"★".repeat(3-et)}</span>
-        </div>
+        ${accessible
+          ? `<div class="etoiles" aria-label="${et} étoile(s) sur 3">${"★".repeat(et)}<span class="vide">${"★".repeat(3-et)}</span></div>`
+          : `<p class="note-verrou">Termine la capsule précédente pour la débloquer.</p>`}
       </div>`;
-    noeud.querySelector(".rond").onclick = ()=>ouvrirMission(i,j);
+    if(accessible) noeud.querySelector(".rond").onclick = ()=>ouvrirMission(i,j);
     parc.appendChild(noeud);
   });
   changerEcran("ecran-chapitre");
@@ -2179,8 +2529,9 @@ function ouvrirChapitre(i){
 let missionCourante = null;
 
 function ouvrirMission(iCh,iM){
-  missionCourante = {iCh,iM};
   const ch = CHAPITRES[iCh], m = ch.missions[iM];
+  if(!missionAccessible(m)){ allerAccueil(); return; } // filet de sécurité : jamais ouvrable si verrouillée
+  missionCourante = {iCh,iM};
   document.getElementById("retourChapitre").onclick = ()=>ouvrirChapitre(iCh);
   const cadre = document.getElementById("cadreMission");
   changerEcran("ecran-mission"); // afficher l'écran d'abord : le plateau a besoin de ses vraies dimensions
@@ -2239,7 +2590,7 @@ function validerDemo(){
   const {iCh,iM} = missionCourante;
   const id = CHAPITRES[iCh].missions[iM].id;
   progression[id] = Math.max(etoilesMission(id), 2);
-  sauverProgression();
+  sauverProgression(id);
   rafraichirTout();
   ouvrirChapitre(iCh);
 }
@@ -7839,7 +8190,7 @@ function reussirMission(etoiles, texte){
   /* Si cette réussite achève le parcours, la fête attend la fermeture
      de l'écran de capsule pour ne pas empiler deux fenêtres. */
   if(!avantTermine && parcoursTermine()) finDeParcoursAAfficher = true;
-  sauverProgression();
+  sauverProgression(id);
   rafraichirTout();
   document.getElementById("etoilesVictoire").innerHTML =
     "★".repeat(record) + `<span class="vide">${"★".repeat(3-record)}</span>`;
@@ -7889,7 +8240,7 @@ document.addEventListener("click", (e)=>{
 
 /* Lancement */
 rafraichirTout();
-chargerProgression();
+document.getElementById("voileCode").classList.add("actif");
 </script>
 </body>
 </html>
